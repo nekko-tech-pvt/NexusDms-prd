@@ -423,13 +423,12 @@ def nexus_atom_page():
             st.write(result)
 
 
-# Main App Function
-def main():
+def main_app():
     # Display the company logo at the top
     logo_path = "nekko logo black bg.png"  # Update this to the correct path to your logo
     if os.path.exists(logo_path):
         st.image(logo_path, width=200)
-        
+
     st.sidebar.title("Navigation")
     page = st.sidebar.selectbox("Choose a page:", ["Document Upload", "Query Documents", "Nexus Atom"])
 
@@ -439,6 +438,29 @@ def main():
         query_documents_page()
     elif page == "Nexus Atom":
         nexus_atom_page()
+
+# Login function
+def login_screen():
+    st.title("Ready to Dive In? Sign In!")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if username == "nekko_anand" and password == "Anand4nekko":
+            st.session_state["logged_in"] = True
+            st.rerun()
+        else:
+            st.error("Invalid username or password.")
+
+# Main function to handle login and app rendering
+def main():
+    if "logged_in" not in st.session_state:
+        st.session_state["logged_in"] = False
+
+    if st.session_state["logged_in"]:
+        main_app()
+    else:
+        login_screen()
 
 if __name__ == "__main__":
     main()
