@@ -18,7 +18,6 @@ endpoint = "https://nexusdms-prod.cognitiveservices.azure.com/"
 key = "ESfia82tujFgMjU0ijYWqfQ73YqEOVZPB4voGO6uqiSPyiBvcjlmJQQJ99BAACYeBjFXJ3w3AAALACOGW9T6"
 document_analysis_client = DocumentAnalysisClient(endpoint=endpoint, credential=AzureKeyCredential(key))
 
-
 # Function for querying documents
 def query_documents_page():
     st.title("Query Documents")
@@ -35,28 +34,30 @@ def query_documents_page():
     # Input for the user to ask a question
     query = st.text_input("Ask a question about the documents (e.g., 'Compare amounts for employee benefits and management')")
 
-    # Process the query and display the results
-    if query:
-        result = query_documents(query)
-        st.session_state.query_history.append(query)  # Append query to the session history
-        
-        # Display results or generated Python code
-        if "```python" in result:
-            st.write(result.split("```python")[0])
-            code = result.split("```python")[1].split("```")[0]
-            print(f"<<<{code}<<<")
-            try:
-                # Execute and display Plotly chart if generated
-                exec_globals = {"px": px, "go": go}
-                exec(code, exec_globals)
-                if "fig" in exec_globals:
-                    st.plotly_chart(exec_globals["fig"])  # Render the Plotly chart in Streamlit
-                else:
-                    st.error("No valid Plotly figure was generated in the code.")
-            except Exception as e:
-                st.error(f"Error executing code: {e}")
-        else:
-            st.write(result)
+    # Add a submit button for the query
+    if st.button("Submit"):
+        # Process the query and display the results
+        if query:
+            result = query_documents(query)
+            st.session_state.query_history.append(query)  # Append query to the session history
+
+            # Display results or generated Python code
+            if "```python" in result:
+                st.write(result.split("```python")[0])
+                code = result.split("```python")[1].split("```")[0]
+                print(f"<<<{code}<<<")
+                try:
+                    # Execute and display Plotly chart if generated
+                    exec_globals = {"px": px, "go": go}
+                    exec(code, exec_globals)
+                    if "fig" in exec_globals:
+                        st.plotly_chart(exec_globals["fig"])  # Render the Plotly chart in Streamlit
+                    else:
+                        st.error("No valid Plotly figure was generated in the code.")
+                except Exception as e:
+                    st.error(f"Error executing code: {e}")
+            else:
+                st.write(result)
 
 # Function for processing uploaded files (PDFs and images)
 def process_uploaded_file(uploaded_file):
@@ -422,12 +423,16 @@ def nexus_atom_page():
         else:
             st.write(result)
 
-
 def main_app():
     # Display the company logo at the top
     logo_path = "nekko logo black bg.png"  # Update this to the correct path to your logo
     if os.path.exists(logo_path):
         st.image(logo_path, width=200)
+
+    # Logout button
+    if st.sidebar.button("Logout"):
+        st.session_state["logged_in"] = False
+        st.rerun()
 
     st.sidebar.title("Navigation")
     page = st.sidebar.selectbox("Choose a page:", ["Document Upload", "Query Documents", "Nexus Atom"])
