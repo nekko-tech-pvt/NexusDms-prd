@@ -18,6 +18,14 @@ endpoint = "https://nexusdms-prod.cognitiveservices.azure.com/"
 key = "ESfia82tujFgMjU0ijYWqfQ73YqEOVZPB4voGO6uqiSPyiBvcjlmJQQJ99BAACYeBjFXJ3w3AAALACOGW9T6"
 document_analysis_client = DocumentAnalysisClient(endpoint=endpoint, credential=AzureKeyCredential(key))
 
+def remove_last_line(text):
+    lines = text.splitlines()
+    filtered_lines = [
+        line for line in lines 
+        if 'python' not in line.lower() and 'plotly' not in line.lower() and "code" not in line.lower()
+    ]
+    return "\n".join(filtered_lines)
+
 # Function for querying documents
 def query_documents_page():
     st.title("Query Documents")
@@ -43,7 +51,9 @@ def query_documents_page():
 
             # Display results or generated Python code
             if "```python" in result:
-                st.write(result.split("```python")[0])
+                graphtext = result.split("```python")[0]
+                fingrphtext = remove_last_line(graphtext)
+                st.write(fingrphtext)
                 code = result.split("```python")[1].split("```")[0]
                 print(f"<<<{code}<<<")
                 try:
